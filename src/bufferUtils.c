@@ -115,20 +115,20 @@ uint32_t pBuffRead(plain_buffer_handle* handle, uint8_t* data, uint32_t dataLen,
 }
 
 void pBuffWriteByte(plain_buffer_handle* handle, uint8_t val, uint8_t ht, uint32_t off){
-	if(handle==NULL || handle->buffLen==0 || off>=handle->elemNum) return;
+	if(handle==NULL || handle->buffLen==0 || handle->elemNum==0  || off>=handle->elemNum) return;
 
 	if(!ht) handle->buff[off]=val;
-	else handle->buff[handle->elemNum-off]=val;
+	else handle->buff[handle->elemNum-1-off]=val;
 
 	return;
 }
 
 uint8_t pBuffReadByte(plain_buffer_handle* handle, uint8_t ht, uint32_t off){
-	if(handle==NULL || handle->buffLen==0 || off>=handle->elemNum) return 0;
+	if(handle==NULL || handle->buffLen==0 || handle->elemNum==0 || off>=handle->elemNum) return 0;
 
 	if(!ht) return handle->buff[off];
 	//else
-	return handle->buff[handle->elemNum-off];
+	return handle->buff[handle->elemNum-1-off];
 }
 
 uint32_t pBuffPush(plain_buffer_handle* handle, uint8_t* data, uint32_t dataLen, uint8_t ht){
@@ -417,20 +417,20 @@ uint32_t cBuffRead(circular_buffer_handle* handle, uint8_t* data, uint32_t dataL
 }
 
 void cBuffWriteByte(circular_buffer_handle* handle, uint8_t val, uint8_t ht, uint32_t off){
-	if(handle==NULL || handle->buffLen==0 || off>=handle->elemNum) return;
+	if(handle==NULL || handle->buffLen==0 || handle->elemNum==0 || off>=handle->elemNum) return;
 
 	if(!ht) handle->buff[cBuffGetMemIndex(handle,off)]=val;
-	else handle->buff[cBuffGetMemIndex(handle,handle->elemNum-off)]=val;
+	else handle->buff[cBuffGetMemIndex(handle,handle->elemNum-1-off)]=val;
 
 	return;
 }
 
 uint8_t cBuffReadByte(circular_buffer_handle* handle, uint8_t ht, uint32_t off){
-	if(handle==NULL || handle->buffLen==0 || off>=handle->elemNum) return 0;
+	if(handle==NULL || handle->buffLen==0 || handle->elemNum==0 || off>=handle->elemNum) return 0;
 
 	if(!ht) return handle->buff[cBuffGetMemIndex(handle,off)];
 	//else
-	return handle->buff[cBuffGetMemIndex(handle,handle->elemNum-off)];
+	return handle->buff[cBuffGetMemIndex(handle,handle->elemNum-1-off)];
 }
 
 
