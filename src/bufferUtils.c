@@ -75,7 +75,11 @@ void pBuffPrint(plain_buffer_handle* handle, uint8_t flags){
 				printf("|");
 			}else printf(" ");
 			
-			printf("%u",handle->buff[b]);
+			if(flags & PRINTBUFF_HEX){
+				printf("%02x",handle->buff[b]);
+			}else{
+				printf("%u",handle->buff[b]);
+			}
 
 			if(b==handle->elemNum-1){ //if tail element
 				printf("|\t");
@@ -232,11 +236,17 @@ void cBuffPrint(circular_buffer_handle* handle, uint8_t flags){
 				printf("|");
 			}else printf(" ");
 			
-			
+			uint8_t byte;
 			if(flags & PRINTBUFF_MEMORY){
-				printf("%u",handle->buff[b]);
+				byte=handle->buff[b];
 			}else{
-				printf("%u",handle->buff[cBuffGetMemIndex(handle,tmpIndx)]);
+				byte=handle->buff[cBuffGetMemIndex(handle,tmpIndx)];
+			}
+
+			if(flags & PRINTBUFF_HEX){
+				printf("%02x",byte);
+			}else{
+				printf("%u",byte);
 			}
 
 			if(tmpIndx==handle->elemNum-1){ //if tail element

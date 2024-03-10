@@ -39,6 +39,10 @@
  * @brief flag to avoid printing buffer bytes that are outside the buffer
  */
 #define PRINTBUFF_NOEMPTY 0x08
+/**
+ * @brief flag to print data in hexadecimal formt
+ */
+#define PRINTBUFF_HEX 0x10
 
 //PLAIN BUFFER UTILITIES ----------------------------------
 
