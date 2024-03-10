@@ -127,7 +127,8 @@ uint8_t pBuffReadByte(plain_buffer_handle* handle, uint8_t ht, uint32_t off){
 	if(handle==NULL || handle->buffLen==0 || off>=handle->elemNum) return 0;
 
 	if(!ht) return handle->buff[off];
-	else return handle->buff[handle->elemNum-off];
+	//else
+	return handle->buff[handle->elemNum-off];
 }
 
 uint32_t pBuffPush(plain_buffer_handle* handle, uint8_t* data, uint32_t dataLen, uint8_t ht){
@@ -424,11 +425,12 @@ void cBuffWriteByte(circular_buffer_handle* handle, uint8_t val, uint8_t ht, uin
 	return;
 }
 
-uint8_t cBuffReadByte(circular_buffer_handle* handl, uint8_t ht, uint32_t off){
+uint8_t cBuffReadByte(circular_buffer_handle* handle, uint8_t ht, uint32_t off){
 	if(handle==NULL || handle->buffLen==0 || off>=handle->elemNum) return 0;
 
 	if(!ht) return handle->buff[cBuffGetMemIndex(handle,off)];
-	else return handle->buff[cBuffGetMemIndex(handle,handle->elemNum-off)];
+	//else
+	return handle->buff[cBuffGetMemIndex(handle,handle->elemNum-off)];
 }
 
 
