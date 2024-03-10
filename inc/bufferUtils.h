@@ -391,6 +391,21 @@ uint8_t cBuffReadByte(circular_buffer_handle* handle, uint8_t ht, uint32_t off);
 void cBuffPush(circular_buffer_handle* handle, uint8_t* data, uint32_t dataLen, uint8_t ht);
 
 /**
+ * @brief Push data on circular buffer by stopping if it gets full.
+ * 
+ * Wrapper of cBuffPush() which stops if the buffer gets full without
+ * overwriting on the other side circularlt.
+ * The actual number of pushed bytes are returned by the function.
+ * 
+ * @param handle buffer handle
+ * @param data data buffer to push
+ * @param dataLen length of data buffer
+ * @param ht start from head or tail flag (0=head !0=tail)
+ * @return uint32_t the actual number of pushed bytes
+ */
+uint32_t cBuffPushToFill(circular_buffer_handle* handle, uint8_t* data, uint32_t dataLen, uint8_t ht);
+
+/**
  * @brief Pull data from circular buffer.
  * 
  * Data can be pulled starting from head or tail, the pull operation doesn't involve

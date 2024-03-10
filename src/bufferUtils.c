@@ -327,6 +327,22 @@ void cBuffPush(circular_buffer_handle* handle, uint8_t* data, uint32_t dataLen, 
 	return;
 }
 
+uint32_t cBuffPushToFill(circular_buffer_handle* handle, uint8_t* data, uint32_t dataLen, uint8_t ht){
+	if(handle==NULL || handle->buffLen==0 || dataLen==0 || data==NULL) return 0;
+
+	//compute the available space
+	uint32_t available=handle->buffLen-handle->elemNum;
+
+	//compute the minimum between available and dataLen
+	if(dataLen<available) available=dataLen;
+
+	//pushing bytes
+	cBuffPush(handle,data,available,ht);
+
+	return available;
+
+}
+
 uint32_t cBuffPull(circular_buffer_handle* handle, uint8_t* data, uint32_t dataLen, uint8_t ht){
 	if(handle==NULL || handle->buffLen==0 || dataLen==0) return 0;
 
