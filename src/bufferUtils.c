@@ -185,6 +185,16 @@ uint32_t pBuffPull(plain_buffer_handle* handle, uint8_t* data, uint32_t dataLen,
 	return retVal;
 }
 
+uint32_t pBuffCut(plain_buffer_handle* handle, uint8_t* data, uint32_t dataLen, uint8_t ht, uint32_t off){
+	if(handle==NULL || handle->elemNum==0 || dataLen==0 || off>=handle->elemNum) return 0;
+
+	//creating temporary circular buffer to allow using cBuff utilities
+	circular_buffer_handle tmpBuff;
+	pBuffToCirc(&tmpBuff,handle);
+
+	return cBuffCut(&tmpBuff,data,dataLen,ht,off);
+}
+
 void pBuffFlush(plain_buffer_handle* handle){
 	if(handle==NULL) return;
 
@@ -269,7 +279,7 @@ void cBuffPrint(circular_buffer_handle* handle, uint8_t flags){
 uint32_t cBuffGetVirtIndex(circular_buffer_handle* handle,uint32_t memIndex){
 	//special case when startIndex==0 is not critical but present to speed-up execution
 	//of plain buffer functions based on circular buffer functions
-	if(handle==NULL || handle->buffLen==0 || handle->startIndex==0) return memIndex;
+	if(handle==NULL || handle->buffLen==0) return memIndex;
 
 	memIndex=memIndex % handle->buffLen;
 
@@ -283,7 +293,7 @@ uint32_t cBuffGetVirtIndex(circular_buffer_handle* handle,uint32_t memIndex){
 uint32_t cBuffGetMemIndex(circular_buffer_handle* handle,uint32_t virtIndex){
 	//special case when startIndex==0 is not critical but present to speed-up execution
 	//of plain buffer functions based on circular buffer functions
-	if(handle==NULL || handle->buffLen==0 || handle->startIndex==0) return virtIndex;
+	if(handle==NULL || handle->buffLen==0) return virtIndex;
 
 	virtIndex=virtIndex % handle->buffLen;
 
@@ -305,7 +315,7 @@ void cBuffPush(circular_buffer_handle* handle, uint8_t* data, uint32_t dataLen, 
 		//we will start pushing from elemNum virtual index
 		pushMemIndx=cBuffGetMemIndex(handle,handle->elemNum);
 	}
-	
+
 	for(uint32_t d=0;d<dataLen;d++){
 		if(ht==0){ //push to head
 			//we push data starting from buffer end, going backwards
@@ -442,13 +452,13 @@ uint32_t cBuffCut(circular_buffer_handle* handle, uint8_t* data, uint32_t dataLe
 	uint32_t shiftLen=0; //length of shift 
 	uint8_t shiftPiece=0; //shortest memory piece to shift (0:first 1:second)
 	if(off<=(handle->elemNum-off-readLen)){ //first buffer piece is shortes
-		shiftStart=off-1;
-		shiftDest=shiftStart+readLen;
+		shiftStart=(ht==0) ? off-1 : handle->elemNum-off;
+		shiftDest=(ht==0) ? off-1+readLen : handle->elemNum-off-readLen;
 		shiftLen=off;
 		shiftPiece=(ht==0) ? 0 : 1;
 	}else{ //second buffer piece is shortest
-		shiftStart=off+readLen;
-		shiftDest=off;
+		shiftStart=(ht==0) ? off+readLen : handle->elemNum-off-1-readLen;
+		shiftDest=(ht==0) ? off : handle->elemNum-off-1;
 		shiftLen=handle->elemNum-off-readLen;
 		shiftPiece=(ht==0) ? 1 : 0;
 	}
@@ -457,16 +467,16 @@ uint32_t cBuffCut(circular_buffer_handle* handle, uint8_t* data, uint32_t dataLe
 		for(uint32_t b=0;b<shiftLen;b++){
 			handle->buff[cBuffGetMemIndex(handle,shiftDest-b)]=handle->buff[cBuffGetMemIndex(handle,shiftStart-b)];
 		}
-		//changing start index and elemNum
-		handle->startIndex=cBuffGetMemIndex(handle,cBuffGetVirtIndex(handle,readLen));
-		handle->elemNum=handle->elemNum-readLen;
+		//changing start index
+		handle->startIndex=cBuffGetMemIndex(handle,readLen);
+		
 	}else{ //shift second memory part backwards
 		for(uint32_t b=0;b<shiftLen;b++){
 			handle->buff[cBuffGetMemIndex(handle,shiftDest+b)]=handle->buff[cBuffGetMemIndex(handle,shiftStart+b)];
 		}
-		//changing elemNum
-		handle->elemNum=handle->elemNum-readLen;
 	}
+	//changing elemnum
+	handle->elemNum=handle->elemNum-readLen;
 	
 	return readLen;
 }
