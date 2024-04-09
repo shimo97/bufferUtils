@@ -426,6 +426,51 @@ uint32_t cBuffRead(circular_buffer_handle* handle, uint8_t* data, uint32_t dataL
 	
 }
 
+uint32_t cBuffCut(circular_buffer_handle* handle, uint8_t* data, uint32_t dataLen, uint8_t ht, uint32_t off){
+	if(handle==NULL || handle->elemNum==0 || dataLen==0 || off>=handle->elemNum) return 0;
+
+	//reading data (using cBuffRead)
+	uint32_t readLen=cBuffRead(handle,data,dataLen,ht,off);
+
+	//returning immediately if nothing to cut
+	if(readLen==0) return readLen; 
+
+	//cutting data from buffer
+	//determining the smaller portion of buffer to shift
+	uint32_t shiftStart=0; //start of shift (virtual)
+	uint32_t shiftDest=0; //shift destination (virtual)
+	uint32_t shiftLen=0; //length of shift 
+	uint8_t shiftPiece=0; //shortest memory piece to shift (0:first 1:second)
+	if(off<=(handle->elemNum-off-readLen)){ //first buffer piece is shortes
+		shiftStart=off-1;
+		shiftDest=shiftStart+readLen;
+		shiftLen=off;
+		shiftPiece=(ht==0) ? 0 : 1;
+	}else{ //second buffer piece is shortest
+		shiftStart=off+readLen;
+		shiftDest=off;
+		shiftLen=handle->elemNum-off-readLen;
+		shiftPiece=(ht==0) ? 1 : 0;
+	}
+	//actual shift
+	if(!shiftPiece){ //shift first memory part forward
+		for(uint32_t b=0;b<shiftLen;b++){
+			handle->buff[cBuffGetMemIndex(handle,shiftDest-b)]=handle->buff[cBuffGetMemIndex(handle,shiftStart-b)];
+		}
+		//changing start index and elemNum
+		handle->startIndex=cBuffGetMemIndex(handle,cBuffGetVirtIndex(handle,readLen));
+		handle->elemNum=handle->elemNum-readLen;
+	}else{ //shift second memory part backwards
+		for(uint32_t b=0;b<shiftLen;b++){
+			handle->buff[cBuffGetMemIndex(handle,shiftDest+b)]=handle->buff[cBuffGetMemIndex(handle,shiftStart+b)];
+		}
+		//changing elemNum
+		handle->elemNum=handle->elemNum-readLen;
+	}
+	
+	return readLen;
+}
+
 void cBuffWriteByte(circular_buffer_handle* handle, uint8_t val, uint8_t ht, uint32_t off){
 	if(handle==NULL || handle->buffLen==0 || handle->elemNum==0 || off>=handle->elemNum) return;
 

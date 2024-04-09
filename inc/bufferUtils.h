@@ -426,6 +426,31 @@ uint32_t cBuffPushToFill(circular_buffer_handle* handle, uint8_t* data, uint32_t
 uint32_t cBuffPull(circular_buffer_handle* handle, uint8_t* data, uint32_t dataLen, uint8_t ht);
 
 /**
+ * @brief Pull data from circuar buffer starting from a middle point.
+ * 
+ * This function can be used to pull bytes from the buffer by starting from
+ * a point in the middle (offset from head/tail), the hole created will be 
+ * closed by shifting the remaining bytes of the buffer (can be intensive).
+ * Cut will occurr for a certain amount of bytes or until the other end of the 
+ * buffer is reached (even if an offset is provided, cutting will eventually stop 
+ * at the head or tail without circularity), if the offset provided is outside the
+ * buffer boundaries nothing will be read.
+ * The data will always be read respecting the order of the input data (if cut
+ * is done starting from tail going backwards at the end the read data will have
+ * its order reversed on the output array).
+ * The function also accepts a NULL data buffer, in that case nothing will be read
+ * but it will still cut the data from buffer and return the number of cutted bytes.
+ * 
+ * @param handle buffer handle
+ * @param data output data buffer to read into
+ * @param dataLen length of data buffer (length of cutted portion)
+ * @param ht start from head or tail flag (0=head !0=tail)
+ * @param off starting offset from head or tail (depending on ht)
+ * @return uint32_t the actual number of cutted bytes
+ */
+uint32_t cBuffCut(circular_buffer_handle* handle, uint8_t* data, uint32_t dataLen, uint8_t ht, uint32_t off);
+
+/**
  * @brief Rotate circular buffer
  * 
  * Rotation can be performed clockwise or anti-clockwise and is performed on data
