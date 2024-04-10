@@ -536,4 +536,30 @@ void cBuffToPlain(plain_buffer_handle* pHandle, circular_buffer_handle* cHandle)
  */
 void pBuffToCirc(circular_buffer_handle* cHandle, plain_buffer_handle* pHandle);
 
+/**
+ * @brief Copy plain buffer to another plain buffer
+ * 
+ * This function basically creates a copy of a plain buffer into another.
+ * NB: The memory array is assigned to the destination so at the end they 
+ * will SHARE the memory region. The dest buffer doesn't need to be initialized
+ * before.
+ *
+ * @param dest destination plain buffer
+ * @param pHandle source plain buffer
+ */
+void pBuffToPlain(plain_buffer_handle* dest, plain_buffer_handle* pHandle);
+
+/**
+ * @brief Copy circular buffer to another circular buffer
+ * 
+ * This function basically creates a copy of a circular buffer into another.
+ * NB: The memory array is assigned to the destination so at the end they 
+ * will SHARE the memory region. The dest buffer doesn't need to be initialized
+ * before.
+ *
+ * @param dest destination circular buffer
+ * @param pHandle source circular buffer
+ */
+void cBuffToCirc(circular_buffer_handle* dest, circular_buffer_handle* cHandle);
+
 #endif

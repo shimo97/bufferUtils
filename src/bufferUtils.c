@@ -568,3 +568,20 @@ void pBuffToCirc(circular_buffer_handle* cHandle, plain_buffer_handle* pHandle){
 
 	return;
 }
+
+void pBuffToPlain(plain_buffer_handle* dest, plain_buffer_handle* pHandle){
+	if(dest==NULL || pHandle==NULL) return;
+
+	dest->buff=pHandle->buff;
+	dest->buffLen=pHandle->buffLen;
+	dest->elemNum=pHandle->elemNum;
+}
+
+void cBuffToCirc(circular_buffer_handle* dest, circular_buffer_handle* cHandle){
+	if(dest==NULL || cHandle==NULL) return;
+
+	dest->buff=cHandle->buff;
+	dest->buffLen=cHandle->buffLen;
+	dest->elemNum=cHandle->elemNum;
+	dest->startIndex=cHandle->startIndex;
+}
