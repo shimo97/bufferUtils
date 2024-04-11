@@ -486,7 +486,7 @@ uint32_t cBuffPushRead(circular_buffer_handle* dest, circular_buffer_handle* sou
 	//actual number of moved bytes
 	uint32_t retVal=len;
 	if(source->elemNum<retVal) retVal=source->elemNum;
-	if((dest->buffLen-dest->elemNum)<retVal) retVal=dest->elemNum;
+	if((dest->buffLen-dest->elemNum)<retVal) retVal=dest->buffLen-dest->elemNum;
 
 	//moving bytes
 	uint8_t byte;
@@ -498,11 +498,11 @@ uint32_t cBuffPushRead(circular_buffer_handle* dest, circular_buffer_handle* sou
 	return retVal;
 }
 
-uint32_t cBuffPushPull(circular_buffer_handle* dest, circular_buffer_handle* source, uint32_t len, uint8_t htSource, uint8_t htDest){
+uint32_t cBuffPushPull(circular_buffer_handle* dest, circular_buffer_handle* source, uint32_t len, uint8_t htDest, uint8_t htSource){
 	if(dest==NULL || source==NULL || dest->buffLen==0 || source->buffLen==0 || len==0) return 0;
 
 	//moving using cBuffPushRead
-	uint32_t retVal=cBuffPushRead(dest,source,len,htSource,htDest);
+	uint32_t retVal=cBuffPushRead(dest,source,len,htDest,htSource);
 	//decreasing element number and chaning startIndex of source
 	source->elemNum-=retVal;
 	if(!htSource) source->startIndex=cBuffGetMemIndex(source,retVal);
