@@ -476,6 +476,41 @@ uint32_t cBuffPull(circular_buffer_handle* handle, uint8_t* data, uint32_t dataL
 uint32_t cBuffCut(circular_buffer_handle* handle, uint8_t* data, uint32_t dataLen, uint8_t ht, uint32_t off);
 
 /**
+ * @brief Function to pull data from a circular buffer and push it into another.
+ * 
+ * This function can be used to move data between one buffer to another.
+ * The data can be pushed or pulled from any combination of head and tail of both
+ * buffers and for a certain amout of bytes. The function will return the actual
+ * number of moved bytes.
+ * 
+ * @param dest destination circular buffer
+ * @param source source circular buffer
+ * @param len number of bytes to move
+ * @param htDest flag to signal if push should happen from head or tail
+ * @param htSource flag to signal if pull should happen from head or tail
+ * @return uint32_t the actual number of moved bytes
+ */
+uint32_t cBuffPushPull(circular_buffer_handle* dest, circular_buffer_handle* source, uint32_t len, uint8_t htDest, uint8_t htSource);
+
+/**
+ * @brief Function to read data from a circular buffer and push it into another.
+ * 
+ * This function can be used to move data between one buffer to another, without
+ * pushing out the data from the source.
+ * The data can be pushed or read from any combination of head and tail of both
+ * buffers and for a certain amout of bytes. The function will return the actual
+ * number of moved bytes.
+ * 
+ * @param dest destination circular buffer
+ * @param source source circular buffer
+ * @param len number of bytes to move
+ * @param htDest flag to signal if push should happen from head or tail
+ * @param htSource flag to signal if read should happen from head or tail
+ * @return uint32_t the actual number of moved bytes
+ */
+uint32_t cBuffPushRead(circular_buffer_handle* dest, circular_buffer_handle* source, uint32_t len, uint8_t htDest, uint8_t htSource);
+
+/**
  * @brief Rotate circular buffer
  * 
  * Rotation can be performed clockwise or anti-clockwise and is performed on data

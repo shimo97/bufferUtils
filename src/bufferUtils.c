@@ -361,7 +361,6 @@ uint32_t cBuffPushToFill(circular_buffer_handle* handle, uint8_t* data, uint32_t
 	cBuffPush(handle,data,available,ht);
 
 	return available;
-
 }
 
 uint32_t cBuffPull(circular_buffer_handle* handle, uint8_t* data, uint32_t dataLen, uint8_t ht){
@@ -479,6 +478,36 @@ uint32_t cBuffCut(circular_buffer_handle* handle, uint8_t* data, uint32_t dataLe
 	handle->elemNum=handle->elemNum-readLen;
 	
 	return readLen;
+}
+
+uint32_t cBuffPushRead(circular_buffer_handle* dest, circular_buffer_handle* source, uint32_t len, uint8_t htDest, uint8_t htSource){
+	if(dest==NULL || source==NULL || dest->buffLen==0 || source->buffLen==0 || len==0) return 0;
+
+	//actual number of moved bytes
+	uint32_t retVal=len;
+	if(source->elemNum<retVal) retVal=source->elemNum;
+	if((dest->buffLen-dest->elemNum)<retVal) retVal=dest->elemNum;
+
+	//moving bytes
+	uint8_t byte;
+	for(uint32_t b=0;b<retVal;b++){
+		cBuffRead(source,&byte,1,htSource,b);
+		cBuffPush(dest,&byte,1,htDest);
+	}
+
+	return retVal;
+}
+
+uint32_t cBuffPushPull(circular_buffer_handle* dest, circular_buffer_handle* source, uint32_t len, uint8_t htSource, uint8_t htDest){
+	if(dest==NULL || source==NULL || dest->buffLen==0 || source->buffLen==0 || len==0) return 0;
+
+	//moving using cBuffPushRead
+	uint32_t retVal=cBuffPushRead(dest,source,len,htSource,htDest);
+	//decreasing element number and chaning startIndex of source
+	source->elemNum-=retVal;
+	if(!htSource) source->startIndex=cBuffGetMemIndex(source,retVal);
+
+	return retVal;
 }
 
 void cBuffWriteByte(circular_buffer_handle* handle, uint8_t val, uint8_t ht, uint32_t off){
